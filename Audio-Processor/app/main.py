@@ -44,10 +44,8 @@ def main():
 def audio_to_text():
     #process audio using wattson
     with open('/app/app/test.mp3','rb') as audio_file:
-        return json.dumps(
-                service.recognize(
+        return  service.recognize(
                 audio=audio_file,
                 content_type='audio/mp3',
                 timestamps=True,
-                word_confidence=True).get_result(),
-            indent=2)
+                word_confidence=True).get_result()
