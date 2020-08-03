@@ -1,14 +1,24 @@
-from typing import List
+#from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-#from sqlalchemy.orm import Session
-#from starlette.responses import RedirectResponse
+from ibm_watson import SpeechToTextV1
+from ibm_watson.websocket import RecognizeCallback, AudioSource
+import threading
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
-#from . import models, schemas
-#from .database import SessionLocal, engine
+authenticator = IAMAuthenticator('BNx3h9w6l_MZRViXbepF-egoyDc_5y92CJr8R3MKdiF0')
+service = SpeechToTextV1(authenticator=authenticator)
+service.set_service_url('https://api.us-south.speech-to-text.watson.cloud.ibm.com/instances/57915824-77d0-45b8-b08b-515adbe01138')
 
-#models.Base.metadata.create_all(bind=engine)
+print("Connected to Watson!")
+
+models = service.list_models().get_result()
+print(json.dumps(models, indent=2))
+
+model = service.get_model('en-US_BroadbandModel').get_result()
+print(json.dumps(model, indent=2))
+
 
 app = FastAPI()
 
@@ -33,4 +43,12 @@ def main():
 @app.get("/send/")
 def audio_to_text():
     #process audio using wattson
-    return records
+    with open(join(dirname(__file__), './test.mp3'),'rb') as audio_file:
+        print(json.dumps(
+                service.recognize(
+                audio=audio_file,
+                content_type='audio/mp3',
+                timestamps=True,
+                word_confidence=True).get_result(),
+            indent=2))
+    return "hola wattson"
