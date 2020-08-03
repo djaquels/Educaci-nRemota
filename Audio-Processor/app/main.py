@@ -1,5 +1,5 @@
 #from typing import List
-
+import json
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from ibm_watson import SpeechToTextV1
@@ -43,7 +43,7 @@ def main():
 @app.get("/send/")
 def audio_to_text():
     #process audio using wattson
-    with open(join(dirname(__file__), './test.mp3'),'rb') as audio_file:
+    with open('/app/app/test.mp3','rb') as audio_file:
         print(json.dumps(
                 service.recognize(
                 audio=audio_file,
