@@ -14,10 +14,10 @@ service.set_service_url('https://api.us-south.speech-to-text.watson.cloud.ibm.co
 print("Connected to Watson!")
 
 models = service.list_models().get_result()
-print(json.dumps(models, indent=2))
+#print(json.dumps(models, indent=2))
 
 model = service.get_model('en-US_BroadbandModel').get_result()
-print(json.dumps(model, indent=2))
+#print(json.dumps(model, indent=2))
 
 
 app = FastAPI()
@@ -41,11 +41,22 @@ def main():
 
 
 @app.get("/send/")
-def audio_to_text():
+def audio_to_text(audio: str):
     #process audio using wattson
-    with open('/app/app/test.mp3','rb') as audio_file:
-        return  service.recognize(
+    textofinal = ""
+    print("Watson working......")
+    with open(audio,'rb') as audio_file:
+        texto = service.recognize(
                 audio=audio_file,
                 content_type='audio/mp3',
                 timestamps=True,
                 word_confidence=True).get_result()
+        print("Getting text")
+        results = texto["results"]
+        ## extract the text for translation and analysis
+        for options in results:
+            transcript = options["alternatives"][0]
+            textofinal += transcript["transcript"]
+        return {"texto": textofinal}
+
+
